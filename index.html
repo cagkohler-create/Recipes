@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Recipe·Note">
-<title>Recipe·Note — Instagram to OneNote</title>
+<title>Recipe·Note</title>
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -31,9 +31,7 @@
     color: var(--ink);
     min-height: 100vh;
     overflow-x: hidden;
-    /* Safe area for notched phones */
     padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
   }
 
   body::before {
@@ -46,269 +44,189 @@
     opacity: 0.5;
   }
 
-  /* ── INSTALL BANNER ── */
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26,18,9,0.75); z-index: 200;
+    align-items: center; justify-content: center; padding: 1.5rem;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 2px; padding: 2rem; width: 100%; max-width: 400px;
+    box-shadow: 5px 5px 0 var(--rust-light);
+  }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 0.4rem; }
+  .modal-desc { font-size: 0.76rem; color: var(--sage); font-family: 'DM Mono', monospace; line-height: 1.65; margin-bottom: 1.25rem; }
+  .modal-desc a { color: var(--rust); }
+  .modal input { margin-bottom: 1rem; font-family: 'DM Mono', monospace; font-size: 0.8rem; }
+  .modal-btns { display: flex; gap: 0.6rem; }
+
+  /* ── BANNERS ── */
   .install-banner {
-    display: none;
-    align-items: center;
-    gap: 0.75rem;
-    background: var(--ink);
-    color: var(--cream);
-    padding: 0.85rem 1.25rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.74rem;
-    position: relative;
-    z-index: 10;
+    display: none; align-items: center; gap: 0.75rem;
+    background: var(--ink); color: var(--cream);
+    padding: 0.85rem 1.25rem; font-family: 'DM Mono', monospace;
+    font-size: 0.72rem; position: relative; z-index: 10;
   }
   .install-banner.show { display: flex; }
   .install-banner p { flex: 1; line-height: 1.4; opacity: 0.85; }
   .install-banner strong { color: var(--gold); opacity: 1; }
-  .install-btn {
-    padding: 0.45rem 1rem;
-    background: var(--rust);
-    color: white;
-    border: none;
-    border-radius: 2px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .install-dismiss {
-    background: transparent;
-    border: none;
-    color: var(--cream);
-    opacity: 0.4;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 0 0.25rem;
-    flex-shrink: 0;
-  }
+  .install-btn { padding: 0.4rem 0.9rem; background: var(--rust); color: white; border: none; border-radius: 2px; font-family: 'DM Mono', monospace; font-size: 0.7rem; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+  .install-dismiss { background: transparent; border: none; color: var(--cream); opacity: 0.4; cursor: pointer; font-size: 1rem; padding: 0 0.2rem; flex-shrink: 0; }
 
-  /* ── INCOMING SHARE BANNER ── */
   .share-banner {
-    display: none;
-    align-items: center;
-    gap: 0.75rem;
-    background: #f0f5f0;
-    border-bottom: 1px solid #aecaae;
-    padding: 0.85rem 1.5rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.75rem;
-    color: #3d5a3d;
-    position: relative;
-    z-index: 10;
+    display: none; align-items: center; gap: 0.75rem;
+    background: #f0f5f0; border-bottom: 1px solid #aecaae;
+    padding: 0.8rem 1.5rem; font-family: 'DM Mono', monospace;
+    font-size: 0.73rem; color: #3d5a3d; z-index: 10;
   }
   .share-banner.show { display: flex; }
   .share-banner p { flex: 1; line-height: 1.4; }
 
+  /* ── HEADER ── */
   header {
-    padding: 1.5rem 2rem 1.25rem;
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
+    padding: 1.4rem 1.5rem 1.2rem;
+    display: flex; align-items: center; gap: 0.75rem;
     border-bottom: 1px solid var(--border);
-    position: relative;
-    z-index: 1;
+    position: relative; z-index: 1;
   }
-
-  .logo { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700; letter-spacing: -0.02em; }
   .logo span { color: var(--rust); font-style: italic; }
-  .tagline { font-size: 0.68rem; font-family: 'DM Mono', monospace; color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; }
+  .tagline { font-size: 0.66rem; font-family: 'DM Mono', monospace; color: var(--gold); letter-spacing: 0.12em; text-transform: uppercase; }
+  .header-right { margin-left: auto; }
+  .settings-btn { background: transparent; border: none; cursor: pointer; color: var(--sage); padding: 0.3rem; display: flex; align-items: center; }
+  .settings-btn:hover { color: var(--rust); }
 
-  main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; position: relative; z-index: 1; }
+  /* ── MAIN ── */
+  main { max-width: 860px; margin: 0 auto; padding: 1.75rem 1.25rem; position: relative; z-index: 1; }
 
-  .url-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 2rem;
-    box-shadow: 4px 4px 0 var(--rust-light);
-    margin-bottom: 1.5rem;
+  .input-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 2px; padding: 1.75rem;
+    box-shadow: 4px 4px 0 var(--rust-light); margin-bottom: 1.5rem;
   }
+  .section-label { font-family: 'DM Mono', monospace; font-size: 0.61rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sage); margin-bottom: 1rem; }
 
-  .section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.62rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--sage);
-    margin-bottom: 1rem;
-  }
-
-  .mode-tabs {
-    display: flex;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    width: fit-content;
-    margin-bottom: 1.5rem;
-  }
-
-  .tab-btn {
-    padding: 0.5rem 1.1rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    color: var(--ink);
-    opacity: 0.45;
-    transition: all 0.18s;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-  }
+  /* ── TABS ── */
+  .mode-tabs { display: flex; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; width: fit-content; margin-bottom: 1.4rem; }
+  .tab-btn { padding: 0.5rem 1rem; font-family: 'DM Mono', monospace; font-size: 0.7rem; cursor: pointer; background: transparent; border: none; border-right: 1px solid var(--border); color: var(--ink); opacity: 0.4; transition: all 0.15s; display: flex; align-items: center; gap: 0.3rem; white-space: nowrap; }
+  .tab-btn:last-child { border-right: none; }
   .tab-btn.active { background: var(--ink); color: var(--cream); opacity: 1; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
 
-  .url-row { display: flex; gap: 0.75rem; }
-
-  input[type="text"], textarea {
-    width: 100%;
-    padding: 0.8rem 0.9rem;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    color: var(--ink);
-    background: var(--cream);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    -webkit-appearance: none;
+  /* ── INPUTS ── */
+  .url-row { display: flex; gap: 0.65rem; }
+  input[type="text"], input[type="password"], textarea {
+    width: 100%; padding: 0.8rem 0.9rem; border: 1px solid var(--border);
+    border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    color: var(--ink); background: var(--cream); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none;
   }
-  input[type="text"]:focus, textarea:focus {
-    border-color: var(--rust);
-    box-shadow: 0 0 0 3px var(--rust-light);
-  }
-  textarea { min-height: 140px; resize: vertical; font-size: 0.84rem; line-height: 1.6; }
+  input:focus, textarea:focus { border-color: var(--rust); box-shadow: 0 0 0 3px var(--rust-light); }
+  textarea { min-height: 130px; resize: vertical; font-size: 0.82rem; line-height: 1.6; }
+  .hint { font-size: 0.69rem; color: var(--sage); margin-top: 0.5rem; font-family: 'DM Mono', monospace; line-height: 1.5; }
 
-  .hint { font-size: 0.7rem; color: var(--sage); margin-top: 0.5rem; font-family: 'DM Mono', monospace; line-height: 1.5; }
-
-  .btn {
-    padding: 0.8rem 1.5rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.76rem;
-    letter-spacing: 0.07em;
-    border: none;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    -webkit-tap-highlight-color: transparent;
-  }
+  /* ── BUTTONS ── */
+  .btn { padding: 0.78rem 1.4rem; font-family: 'DM Mono', monospace; font-size: 0.74rem; letter-spacing: 0.06em; border: none; border-radius: 2px; cursor: pointer; transition: all 0.15s; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.35rem; -webkit-tap-highlight-color: transparent; }
   .btn-primary { background: var(--rust); color: #fff; }
   .btn-primary:hover:not(:disabled) { background: #a83a07; }
   .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--ink); }
   .btn-outline:hover { border-color: var(--rust); color: var(--rust); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .btn-row { display: flex; gap: 0.65rem; margin-top: 1.1rem; flex-wrap: wrap; }
+  .btn-row { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
 
-  .loading-bar {
-    display: none;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 1.1rem 1.4rem;
-    margin-bottom: 1.5rem;
-    align-items: center;
-    gap: 0.9rem;
+  /* ── AUDIO / LISTEN ── */
+  .listen-panel { text-align: center; padding: 0.5rem 0; }
+  .record-btn {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--rust); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 4px 16px rgba(200,73,10,0.3);
+    transition: all 0.2s; -webkit-tap-highlight-color: transparent;
   }
+  .record-btn:hover { transform: scale(1.05); }
+  .record-btn.recording { background: #c0392b; animation: pulse 1.2s infinite; }
+  .record-btn.recording svg { display: none; }
+  .record-btn.recording::after { content: ''; width: 22px; height: 22px; background: white; border-radius: 3px; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 4px 16px rgba(192,57,43,0.3); } 50% { box-shadow: 0 4px 28px rgba(192,57,43,0.7); } }
+  .record-status { font-family: 'DM Mono', monospace; font-size: 0.74rem; color: var(--sage); margin-bottom: 0.75rem; min-height: 1.2rem; }
+  .record-status.active { color: #c0392b; }
+  .transcript-box {
+    background: var(--cream); border: 1px solid var(--border); border-radius: 2px;
+    padding: 0.75rem 1rem; font-size: 0.78rem; line-height: 1.6; color: var(--ink);
+    min-height: 60px; max-height: 140px; overflow-y: auto; text-align: left;
+    margin-bottom: 0.75rem; font-family: 'DM Mono', monospace; display: none;
+  }
+  .transcript-box.show { display: block; }
+  .transcript-hint { font-size: 0.7rem; color: var(--sage); font-family: 'DM Mono', monospace; line-height: 1.5; margin-bottom: 1rem; }
+
+  /* ── LOADING ── */
+  .loading-bar { display: none; background: var(--card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.4rem; margin-bottom: 1.4rem; align-items: center; gap: 0.85rem; }
   .loading-bar.show { display: flex; }
   .spinner { width: 15px; height: 15px; border: 2px solid var(--border); border-top-color: var(--rust); border-radius: 50%; animation: spin 0.65s linear infinite; flex-shrink: 0; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-steps { display: flex; flex-direction: column; gap: 0.25rem; }
-  .loading-step { font-family: 'DM Mono', monospace; font-size: 0.74rem; opacity: 0.3; transition: opacity 0.3s, color 0.3s; }
+  .loading-step { font-family: 'DM Mono', monospace; font-size: 0.72rem; opacity: 0.3; transition: opacity 0.3s, color 0.3s; }
   .loading-step.active { opacity: 1; color: var(--rust); }
   .loading-step.active::before { content: '→ '; }
   .loading-step.done { opacity: 0.55; color: var(--sage); }
   .loading-step.done::before { content: '✓ '; }
 
-  .error-box {
-    background: #fff4f2; border: 1px solid var(--rust); border-radius: 2px;
-    padding: 0.9rem 1.1rem; font-size: 0.81rem; color: var(--rust);
-    font-family: 'DM Mono', monospace; display: none; margin-bottom: 1.5rem; line-height: 1.5;
-  }
+  /* ── ERRORS / INFO ── */
+  .error-box { background: #fff4f2; border: 1px solid var(--rust); border-radius: 2px; padding: 0.85rem 1.1rem; font-size: 0.79rem; color: var(--rust); font-family: 'DM Mono', monospace; display: none; margin-bottom: 1.4rem; line-height: 1.5; }
   .error-box.show { display: block; }
-
-  .info-box {
-    background: #f0f5f0; border: 1px solid #aecaae; border-radius: 2px;
-    padding: 0.85rem 1rem; font-size: 0.74rem; color: #3d5a3d;
-    font-family: 'DM Mono', monospace; margin-top: 0.8rem; line-height: 1.6; display: none;
-  }
+  .info-box { background: #f0f5f0; border: 1px solid #aecaae; border-radius: 2px; padding: 0.8rem 1rem; font-size: 0.72rem; color: #3d5a3d; font-family: 'DM Mono', monospace; margin-top: 0.75rem; line-height: 1.6; display: none; }
   .info-box.show { display: block; }
 
-  /* Recipe card */
+  /* ── RECIPE CARD ── */
   .recipe-output { display: none; animation: fadeUp 0.4s ease; }
   .recipe-output.show { display: block; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 
   .recipe-card { background: var(--card); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; box-shadow: 4px 4px 0 var(--rust-light); }
-
   .recipe-header { background: var(--ink); color: var(--cream); padding: 1.75rem 2rem; position: relative; overflow: hidden; }
   .recipe-header::after { content: '🍽'; position: absolute; right: 1.5rem; top: 50%; transform: translateY(-50%); font-size: 3rem; opacity: 0.1; }
-  .recipe-title { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700; margin-bottom: 0.35rem; padding-right: 3rem; }
-  .recipe-meta { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--gold); display: flex; flex-wrap: wrap; gap: 1rem; }
-  .recipe-source { font-family: 'DM Mono', monospace; font-size: 0.63rem; color: rgba(250,247,242,0.3); margin-top: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 92%; }
+  .recipe-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.35rem; padding-right: 3rem; }
+  .recipe-meta { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--gold); display: flex; flex-wrap: wrap; gap: 1rem; }
+  .recipe-source { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: rgba(250,247,242,0.3); margin-top: 0.4rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 92%; }
 
   .recipe-body { display: grid; grid-template-columns: 1fr 1.6fr; }
-  .ingredients-col { padding: 1.75rem 2rem; border-right: 1px solid var(--border); background: var(--cream); }
-  .instructions-col { padding: 1.75rem 2rem; }
-  .col-title { font-family: 'Playfair Display', serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rust); margin-bottom: 1rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--rust-light); }
+  .ingredients-col { padding: 1.6rem 1.75rem; border-right: 1px solid var(--border); background: var(--cream); }
+  .instructions-col { padding: 1.6rem 1.75rem; }
+  .col-title { font-family: 'Playfair Display', serif; font-size: 0.84rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rust); margin-bottom: 0.9rem; padding-bottom: 0.4rem; border-bottom: 2px solid var(--rust-light); }
 
-  .ingredient-item { display: flex; gap: 0.5rem; padding: 0.38rem 0; font-size: 0.84rem; border-bottom: 1px solid var(--border); align-items: baseline; }
+  .ingredient-item { display: flex; gap: 0.5rem; padding: 0.36rem 0; font-size: 0.83rem; border-bottom: 1px solid var(--border); align-items: baseline; }
   .ingredient-item:last-child { border-bottom: none; }
-  .ingredient-amount { font-family: 'DM Mono', monospace; font-size: 0.73rem; color: var(--sage); min-width: 68px; flex-shrink: 0; }
+  .ingredient-amount { font-family: 'DM Mono', monospace; font-size: 0.71rem; color: var(--sage); min-width: 64px; flex-shrink: 0; }
 
-  .step-item { display: flex; gap: 0.9rem; margin-bottom: 0.9rem; }
-  .step-num { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--rust-light); min-width: 20px; font-weight: 700; line-height: 1.4; }
-  .step-text { font-size: 0.84rem; line-height: 1.65; }
+  .step-item { display: flex; gap: 0.85rem; margin-bottom: 0.85rem; }
+  .step-num { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--rust-light); min-width: 20px; font-weight: 700; line-height: 1.4; }
+  .step-text { font-size: 0.83rem; line-height: 1.65; }
 
-  .recipe-notes { padding: 1.1rem 2rem; border-top: 1px solid var(--border); background: var(--rust-light); font-size: 0.8rem; line-height: 1.6; color: #5a3020; font-style: italic; }
+  .recipe-notes { padding: 1rem 1.75rem; border-top: 1px solid var(--border); background: var(--rust-light); font-size: 0.79rem; line-height: 1.6; color: #5a3020; font-style: italic; }
 
-  .actions-row { display: flex; gap: 0.65rem; padding: 1.1rem 1.5rem; border-top: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
-
-  .onenote-btn {
-    display: inline-flex; align-items: center; gap: 0.45rem;
-    padding: 0.75rem 1.4rem; background: #7719AA; color: white;
-    font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.05em;
-    border: none; border-radius: 2px; cursor: pointer; transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
+  .actions-row { display: flex; gap: 0.6rem; padding: 1rem 1.5rem; border-top: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+  .onenote-btn { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.72rem 1.3rem; background: #7719AA; color: white; font-family: 'DM Mono', monospace; font-size: 0.74rem; letter-spacing: 0.05em; border: none; border-radius: 2px; cursor: pointer; transition: all 0.15s; }
   .onenote-btn:hover { background: #5e1488; }
-  .onenote-icon { width: 17px; height: 17px; background: white; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #7719AA; font-family: Georgia, serif; flex-shrink: 0; }
+  .onenote-icon { width: 16px; height: 16px; background: white; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #7719AA; font-family: Georgia, serif; flex-shrink: 0; }
+  .action-msg { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--sage); margin-left: auto; max-width: 240px; text-align: right; line-height: 1.4; }
 
-  .action-msg { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--sage); margin-left: auto; max-width: 260px; text-align: right; line-height: 1.4; }
-
-  /* ── HOW TO DEPLOY ── */
-  .deploy-section { margin-top: 2.5rem; padding: 1.75rem 2rem; background: var(--card); border: 1px solid var(--border); border-radius: 2px; }
-  .deploy-title { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
-  .deploy-title::after { content: ''; flex: 1; height: 1px; background: var(--border); margin-left: 0.5rem; }
-
-  .deploy-steps { display: flex; flex-direction: column; gap: 0.9rem; }
-  .deploy-step { display: flex; gap: 0.9rem; align-items: flex-start; }
-  .deploy-num { font-family: 'DM Mono', monospace; font-size: 0.68rem; color: var(--rust); background: var(--rust-light); padding: 0.2rem 0.5rem; border-radius: 2px; flex-shrink: 0; margin-top: 0.1rem; }
-  .deploy-text { font-size: 0.82rem; line-height: 1.55; color: var(--ink); }
-  .deploy-text code { font-family: 'DM Mono', monospace; font-size: 0.75rem; background: var(--cream); border: 1px solid var(--border); padding: 0.1rem 0.35rem; border-radius: 2px; }
-  .deploy-text strong { color: var(--rust); }
-
-  /* How it works */
+  /* ── HOW IT WORKS ── */
   .how-section { margin-top: 2rem; padding-top: 1.75rem; border-top: 1px solid var(--border); }
   .how-title { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 1.25rem; }
   .how-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
   .how-step { display: flex; flex-direction: column; gap: 0.35rem; }
   .how-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--rust-light); font-weight: 700; line-height: 1; }
   .how-step h4 { font-size: 0.82rem; font-weight: 500; }
-  .how-step p { font-size: 0.73rem; color: var(--sage); line-height: 1.55; font-family: 'DM Mono', monospace; }
+  .how-step p { font-size: 0.71rem; color: var(--sage); line-height: 1.55; font-family: 'DM Mono', monospace; }
 
   @media (max-width: 600px) {
-    header { padding: 1.25rem; flex-direction: column; gap: 0.15rem; }
+    header { padding: 1.1rem; }
     main { padding: 1.25rem 0.9rem; }
-    .url-card { padding: 1.4rem; }
+    .input-card { padding: 1.4rem; }
     .recipe-body { grid-template-columns: 1fr; }
     .ingredients-col { border-right: none; border-bottom: 1px solid var(--border); }
     .how-grid { grid-template-columns: 1fr; gap: 1rem; }
@@ -320,39 +238,71 @@
 </head>
 <body>
 
-<!-- Install prompt banner (shown when PWA is installable) -->
-<div class="install-banner" id="install-banner">
-  <p>Install <strong>Recipe·Note</strong> to your home screen so it appears in Instagram's share menu.</p>
-  <button class="install-btn" id="install-btn">Install</button>
-  <button class="install-dismiss" id="install-dismiss" aria-label="Dismiss">✕</button>
+<!-- API Key Modal -->
+<div class="modal-overlay" id="api-modal">
+  <div class="modal">
+    <div class="modal-title">Anthropic API Key</div>
+    <div class="modal-desc">
+      Recipe·Note uses Claude AI to fetch URLs and extract recipes from audio.<br><br>
+      Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key.<br><br>
+      Your key is saved on this device only and never shared with anyone.
+    </div>
+    <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" autocorrect="off" spellcheck="false" />
+    <div class="modal-btns">
+      <button class="btn btn-primary" onclick="saveApiKey()">Save Key</button>
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
 </div>
 
-<!-- Incoming share confirmation (shown when app is opened via share sheet) -->
+<!-- Install banner -->
+<div class="install-banner" id="install-banner">
+  <p>Install <strong>Recipe·Note</strong> to appear in Instagram's share menu.</p>
+  <button class="install-btn" id="install-btn">Install</button>
+  <button class="install-dismiss" id="install-dismiss">✕</button>
+</div>
+
+<!-- Share received banner -->
 <div class="share-banner" id="share-banner">
   <span>📲</span>
   <p id="share-banner-text">Received from Instagram — extracting recipe…</p>
 </div>
 
 <header>
-  <div class="logo">Recipe<span>·Note</span></div>
-  <div class="tagline">Instagram → OneNote</div>
+  <div>
+    <div class="logo">Recipe<span>·Note</span></div>
+    <div class="tagline">Instagram → OneNote</div>
+  </div>
+  <div class="header-right">
+    <button class="settings-btn" onclick="openModal()" title="API Key">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
 </header>
 
 <main>
-  <div class="url-card">
+  <div class="input-card">
     <div class="section-label">Get recipe from Instagram</div>
 
     <div class="mode-tabs">
       <button class="tab-btn active" onclick="switchMode('url')" id="tab-url-btn">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        Paste Link
+        Link
       </button>
       <button class="tab-btn" onclick="switchMode('caption')" id="tab-caption-btn">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Paste Caption
+        Caption
+      </button>
+      <button class="tab-btn" onclick="switchMode('audio')" id="tab-audio-btn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        Listen
       </button>
     </div>
 
+    <!-- URL tab -->
     <div id="panel-url" class="tab-panel active">
       <div class="url-row">
         <input type="text" id="url-input" placeholder="https://www.instagram.com/p/…"
@@ -360,16 +310,36 @@
                onkeydown="if(event.key==='Enter') extractFromURL()" />
         <button class="btn btn-primary" onclick="extractFromURL()" id="url-btn">Extract →</button>
       </div>
-      <p class="hint">// Paste an Instagram post URL — or share directly from the Instagram app once installed</p>
+      <p class="hint">// Paste link or share from Instagram — AI reads the post automatically</p>
       <div class="info-box" id="url-info-box"></div>
     </div>
 
+    <!-- Caption tab -->
     <div id="panel-caption" class="tab-panel">
-      <textarea id="caption-input" placeholder="Paste the Instagram caption here — ingredients, steps, everything…"></textarea>
-      <p class="hint">// In Instagram: tap ··· on any post → Copy → paste above</p>
+      <textarea id="caption-input" placeholder="Paste the Instagram caption here…"></textarea>
+      <p class="hint">// In Instagram: tap ··· → Copy link won't work; try long-pressing the caption text to select &amp; copy it</p>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="extractFromCaption()">Extract Recipe →</button>
         <button class="btn btn-outline" onclick="loadExample()">Load example</button>
+      </div>
+    </div>
+
+    <!-- Audio / Listen tab -->
+    <div id="panel-audio" class="tab-panel">
+      <div class="listen-panel">
+        <p class="transcript-hint">Play the Instagram video on your phone with sound on, then tap the mic button below. The app will listen and extract the recipe from what's being said.</p>
+        <div class="record-status" id="record-status">Tap to start listening</div>
+        <button class="record-btn" id="record-btn" onclick="toggleListening()">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="0">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" stroke-width="2"/>
+          </svg>
+        </button>
+        <div class="transcript-box" id="transcript-box"></div>
+        <div class="btn-row" style="justify-content:center;" id="audio-extract-row" style="display:none;">
+          <button class="btn btn-primary" id="audio-extract-btn" onclick="extractFromTranscript()" style="display:none;">Extract Recipe →</button>
+          <button class="btn btn-outline" onclick="clearTranscript()">Clear</button>
+        </div>
       </div>
     </div>
   </div>
@@ -411,58 +381,23 @@
     </div>
   </div>
 
-  <!-- Deploy instructions, shown only when not already installed as PWA -->
-  <div class="deploy-section" id="deploy-section">
-    <div class="deploy-title">Appear in Instagram's share menu</div>
-    <div class="deploy-steps">
-      <div class="deploy-step">
-        <span class="deploy-num">step 1</span>
-        <div class="deploy-text">
-          <strong>Host these 3 files</strong> on any free HTTPS host — drag the <code>recipenote/</code> folder onto
-          <a href="https://netlify.com" target="_blank" style="color:var(--rust);">Netlify Drop</a>,
-          <a href="https://vercel.com" target="_blank" style="color:var(--rust);">Vercel</a>, or
-          <a href="https://pages.github.com" target="_blank" style="color:var(--rust);">GitHub Pages</a>.
-          You'll get a free <code>yourname.netlify.app</code> URL.
-        </div>
-      </div>
-      <div class="deploy-step">
-        <span class="deploy-num">step 2</span>
-        <div class="deploy-text">
-          <strong>Open the URL in Chrome on Android</strong> (or Safari on iOS). After a moment,
-          Chrome will show an "Add to Home Screen" banner, or tap the ⋮ menu → <em>Add to Home Screen</em>.
-          On iOS Safari, tap the Share icon → <em>Add to Home Screen</em>.
-        </div>
-      </div>
-      <div class="deploy-step">
-        <span class="deploy-num">step 3</span>
-        <div class="deploy-text">
-          <strong>On Android:</strong> once installed, open any Instagram post, tap <em>Share → More</em>,
-          and <strong>Recipe·Note</strong> will appear in the list. Tap it and the recipe extracts automatically. 🎉
-          <br><br>
-          <strong>On iOS:</strong> the Share Target API isn't supported in Safari PWAs yet.
-          Use the URL paste mode or copy the caption instead.
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="how-section">
     <div class="how-title">How it works</div>
     <div class="how-grid">
       <div class="how-step">
         <div class="how-num">01</div>
-        <h4>Share or paste</h4>
-        <p>Share directly from Instagram (Android, after install) or paste the post URL or caption.</p>
+        <h4>Share, paste or listen</h4>
+        <p>Share from Instagram, paste the link, or use Listen mode to extract from a video.</p>
       </div>
       <div class="how-step">
         <div class="how-num">02</div>
         <h4>AI structures it</h4>
-        <p>Claude fetches the post and extracts ingredients, quantities, and steps automatically.</p>
+        <p>Claude extracts ingredients, quantities, and steps into a clean format.</p>
       </div>
       <div class="how-step">
         <div class="how-num">03</div>
         <h4>Save to OneNote</h4>
-        <p>Download the .html file and drag it into any OneNote notebook, or use Insert → Page from File.</p>
+        <p>Download the .html file and drag it into any OneNote notebook section.</p>
       </div>
     </div>
   </div>
@@ -473,369 +408,326 @@ let currentMode = 'url';
 let currentRecipe = null;
 let currentSourceUrl = '';
 let deferredInstallPrompt = null;
+let recognition = null;
+let isListening = false;
+let fullTranscript = '';
+
+/* ── API KEY ── */
+function getApiKey() { return localStorage.getItem('rn_api_key') || ''; }
+function saveApiKey() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key.startsWith('sk-ant-')) { alert('That doesn\'t look right — the key should start with sk-ant-'); return; }
+  localStorage.setItem('rn_api_key', key);
+  closeModal();
+  hideError();
+}
+function openModal() {
+  const k = getApiKey();
+  if (k) document.getElementById('api-key-input').value = k;
+  document.getElementById('api-modal').classList.add('show');
+}
+function closeModal() { document.getElementById('api-modal').classList.remove('show'); }
+function requireApiKey() {
+  const key = getApiKey();
+  if (!key) { openModal(); return null; }
+  return key;
+}
 
 /* ── PWA INSTALL ── */
 window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  // Only show if not already running as installed PWA
-  if (!window.matchMedia('(display-mode: standalone)').matches) {
+  e.preventDefault(); deferredInstallPrompt = e;
+  if (!window.matchMedia('(display-mode: standalone)').matches)
     document.getElementById('install-banner').classList.add('show');
-  }
 });
-
 document.getElementById('install-btn').addEventListener('click', async () => {
   if (!deferredInstallPrompt) return;
   deferredInstallPrompt.prompt();
-  const { outcome } = await deferredInstallPrompt.userChoice;
+  await deferredInstallPrompt.userChoice;
   deferredInstallPrompt = null;
   document.getElementById('install-banner').classList.remove('show');
 });
-
-document.getElementById('install-dismiss').addEventListener('click', () => {
-  document.getElementById('install-banner').classList.remove('show');
-});
-
-// Hide deploy section when running as installed PWA
-if (window.matchMedia('(display-mode: standalone)').matches) {
-  document.getElementById('deploy-section').style.display = 'none';
-}
+document.getElementById('install-dismiss').addEventListener('click', () =>
+  document.getElementById('install-banner').classList.remove('show'));
 
 /* ── SERVICE WORKER ── */
-// ── INLINE SERVICE WORKER ──
 if ('serviceWorker' in navigator) {
   const swCode = `
-const CACHE = 'recipenote-v1';
-self.addEventListener('install', e => {
-  self.skipWaiting();
-});
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    )
-  );
-  self.clients.claim();
-});
-self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  if (url.hostname === 'api.anthropic.com') return;
-  if (url.hostname.includes('fonts.')) return;
-  if (url.hostname.includes('placehold.')) return;
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      return cached || fetch(e.request).then(response => {
-        const clone = response.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return response;
-      }).catch(() => cached);
-    })
-  );
-});`;
-  const swBlob = new Blob([swCode], {type: 'application/javascript'});
-  const swUrl = URL.createObjectURL(swBlob);
-  navigator.serviceWorker.register(swUrl, {scope: './'}).catch(console.warn);
+const CACHE='recipenote-v2';
+self.addEventListener('install',e=>{self.skipWaiting();});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))));self.clients.claim();});
+self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(u.hostname==='api.anthropic.com'||u.hostname.includes('fonts.'))return;e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{const cl=r.clone();caches.open(CACHE).then(ca=>ca.put(e.request,cl));return r;}).catch(()=>c)));});`;
+  const swBlob = new Blob([swCode], {type:'application/javascript'});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob), {scope:'./'}).catch(()=>{});
 }
 
-/* ── SHARE TARGET HANDLER ── */
-// When Instagram shares to this app, the URL params are: ?url=...&title=...&text=...
+/* ── SHARE TARGET ── */
 window.addEventListener('load', () => {
-  const params = new URLSearchParams(window.location.search);
-  const sharedUrl   = params.get('url')   || '';
-  const sharedText  = params.get('text')  || '';
-  const sharedTitle = params.get('title') || '';
-
-  // Combine all shared content to find an Instagram URL
-  const combined = [sharedUrl, sharedText, sharedTitle].join(' ');
-  const igMatch  = combined.match(/https?:\/\/(?:www\.)?instagram\.com\/[^\s"'>]+/);
-
+  if (!getApiKey()) setTimeout(() => openModal(), 700);
+  const p = new URLSearchParams(window.location.search);
+  const sharedUrl  = p.get('url')  || '';
+  const sharedText = p.get('text') || '';
+  const combined   = [sharedUrl, sharedText, p.get('title')||''].join(' ');
+  const igMatch    = combined.match(/https?:\/\/(?:www\.)?instagram\.com\/[^\s"'>]+/);
   if (igMatch) {
-    const url = igMatch[0];
-    // Show share received banner
-    const banner = document.getElementById('share-banner');
-    document.getElementById('share-banner-text').textContent =
-      '📲 Received from Instagram — extracting recipe…';
-    banner.classList.add('show');
-
-    // Fill the URL input and auto-extract
-    document.getElementById('url-input').value = url;
-    switchMode('url');
-    extractFromURL();
-
+    document.getElementById('share-banner').classList.add('show');
+    document.getElementById('url-input').value = igMatch[0];
+    switchMode('url'); extractFromURL();
   } else if (sharedText && sharedText.length > 80) {
-    // Looks like a caption was shared as text
-    const banner = document.getElementById('share-banner');
-    document.getElementById('share-banner-text').textContent =
-      '📲 Caption received from Instagram — extracting recipe…';
-    banner.classList.add('show');
-
+    document.getElementById('share-banner').classList.add('show');
     document.getElementById('caption-input').value = sharedText;
-    switchMode('caption');
-    extractFromCaption();
+    switchMode('caption'); extractFromCaption();
   }
 });
 
-/* ── UI HELPERS ── */
+/* ── UI ── */
 function switchMode(mode) {
   currentMode = mode;
-  ['url', 'caption'].forEach(m => {
-    document.getElementById('panel-' + m).classList.toggle('active', m === mode);
-    document.getElementById('tab-' + m + '-btn').classList.toggle('active', m === mode);
+  ['url','caption','audio'].forEach(m => {
+    document.getElementById('panel-'+m).classList.toggle('active', m===mode);
+    document.getElementById('tab-'+m+'-btn').classList.toggle('active', m===mode);
   });
-  hideError();
-  setUrlInfo('');
+  hideError(); setUrlInfo('');
 }
 
 function loadExample() {
-  document.getElementById('caption-input').value = `🍝 One-Pan Lemon Garlic Pasta 🍋\n\nThe easiest weeknight dinner — 20 minutes, ONE pan!\n\nINGREDIENTS\n• 200g spaghetti\n• 4 cloves garlic, thinly sliced\n• 3 tbsp olive oil\n• 1 lemon — zest + juice\n• 500ml vegetable broth\n• ½ cup cherry tomatoes, halved\n• Handful fresh basil\n• Salt & black pepper\n• Parmesan to serve\n\nSTEPS\n1. Add spaghetti, garlic, olive oil, broth, lemon zest and a big pinch of salt to a wide pan.\n2. Bring to a boil, stir frequently for 9–10 min until pasta is al dente and liquid mostly absorbed.\n3. Stir in tomatoes and lemon juice, cook 1 more minute.\n4. Toss with fresh basil, season with pepper.\n5. Serve with parmesan if desired.\n\nServes 2. Perfect for meal prep!\n#pasta #easyrecipe`;
+  document.getElementById('caption-input').value = `🍝 One-Pan Lemon Garlic Pasta 🍋\n\nThe easiest weeknight dinner — 20 minutes, ONE pan!\n\nINGREDIENTS\n• 200g spaghetti\n• 4 cloves garlic, thinly sliced\n• 3 tbsp olive oil\n• 1 lemon — zest + juice\n• 500ml vegetable broth\n• ½ cup cherry tomatoes, halved\n• Handful fresh basil\n• Salt & black pepper\n• Parmesan to serve\n\nSTEPS\n1. Add spaghetti, garlic, olive oil, broth, lemon zest and salt to a wide pan.\n2. Bring to boil, stir for 9-10 min until al dente.\n3. Add tomatoes and lemon juice, cook 1 min more.\n4. Toss with basil, season.\n5. Serve with parmesan.\n\nServes 2.\n#pasta #easyrecipe`;
 }
 
 function setLoadingSteps(steps) {
-  document.getElementById('loading-steps').innerHTML =
-    steps.map((s, i) => `<div class="loading-step" id="lstep-${i}">${s}</div>`).join('');
+  document.getElementById('loading-steps').innerHTML = steps.map((s,i)=>`<div class="loading-step" id="lstep-${i}">${s}</div>`).join('');
   document.getElementById('loading-bar').classList.add('show');
 }
-
-function markStep(i, state) {
-  const el = document.getElementById('lstep-' + i);
-  if (!el) return;
-  el.classList.remove('active', 'done');
-  el.classList.add(state);
-}
-
+function markStep(i,state) { const e=document.getElementById('lstep-'+i); if(e){e.classList.remove('active','done');e.classList.add(state);} }
 function hideLoading() { document.getElementById('loading-bar').classList.remove('show'); }
-function showError(msg) { const e = document.getElementById('error-box'); e.innerHTML = '⚠ ' + msg; e.classList.add('show'); }
+function showError(msg) { const e=document.getElementById('error-box'); e.innerHTML='⚠ '+msg; e.classList.add('show'); }
 function hideError() { document.getElementById('error-box').classList.remove('show'); }
-function setUrlInfo(msg) { const e = document.getElementById('url-info-box'); if (msg) { e.innerHTML = msg; e.classList.add('show'); } else e.classList.remove('show'); }
+function setUrlInfo(msg) { const e=document.getElementById('url-info-box'); if(msg){e.innerHTML=msg;e.classList.add('show');}else e.classList.remove('show'); }
 
 /* ── EXTRACT FROM URL ── */
 async function extractFromURL() {
   let raw = document.getElementById('url-input').value.trim();
   if (!raw) { showError('Please paste an Instagram URL first.'); return; }
-
   let url = raw.split('?')[0].split('#')[0];
   if (!url.endsWith('/')) url += '/';
+  if (!url.includes('instagram.com')) { showError('That doesn\'t look like an Instagram link.'); return; }
 
-  if (!url.includes('instagram.com')) {
-    showError('That doesn\'t look like an Instagram link. Expected: https://www.instagram.com/p/ABC123/');
-    return;
-  }
+  const apiKey = requireApiKey();
+  if (!apiKey) return;
 
   currentSourceUrl = url;
-  hideError();
-  setUrlInfo('');
+  hideError(); setUrlInfo('');
   document.getElementById('recipe-output').classList.remove('show');
   document.getElementById('url-btn').disabled = true;
 
-  setLoadingSteps(['Fetching Instagram post…', 'Reading recipe content…', 'Structuring recipe…']);
-  markStep(0, 'active');
-
-  const systemPrompt = `You are a recipe extraction assistant. Use your web_search tool to fetch the Instagram post URL provided, read its content, and extract any recipe. Return ONLY raw JSON — no markdown, no explanation.`;
-
-  const userPrompt = `Fetch and extract the recipe from: ${url}
-
-Return ONLY this JSON (no markdown fences):
-{
-  "title": "Recipe name",
-  "servings": "e.g. 4 servings or empty string",
-  "time": "prep/cook time or empty string",
-  "difficulty": "Easy / Medium / Hard or empty string",
-  "author": "Instagram username if visible, else empty string",
-  "ingredients": [{ "amount": "200g", "item": "spaghetti" }],
-  "steps": ["Step one.", "Step two."],
-  "notes": "Tips, storage, variations. Empty string if none."
-}
-
-If you cannot access the post or there's no recipe, return:
-{ "error": "Brief explanation" }`;
+  setLoadingSteps(['Fetching Instagram post…','Reading recipe content…','Structuring recipe…']);
+  markStep(0,'active');
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        system: systemPrompt,
+        model: 'claude-sonnet-4-20250514', max_tokens: 1500,
+        system: 'You are a recipe extraction assistant. Use web_search to fetch the Instagram URL provided. Return ONLY raw JSON, no markdown.',
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: userPrompt }]
+        messages: [{ role: 'user', content: `Fetch and extract the recipe from: ${url}\n\nReturn ONLY this JSON:\n{"title":"","servings":"","time":"","difficulty":"","author":"","ingredients":[{"amount":"","item":""}],"steps":[""],"notes":""}\n\nIf no recipe found: {"error":"explanation"}` }]
       })
     });
-
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
-
-    markStep(0, 'done'); markStep(1, 'active');
-
-    const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
-
-    markStep(1, 'done'); markStep(2, 'active');
-
-    const clean = text.replace(/```json|```/g, '').trim();
-    let result;
-    try { result = JSON.parse(clean); }
-    catch { const m = clean.match(/\{[\s\S]*\}/); if (m) result = JSON.parse(m[0]); else throw new Error('Could not parse recipe. Try pasting the caption directly.'); }
-
+    markStep(0,'done'); markStep(1,'active');
+    const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    markStep(1,'done'); markStep(2,'active');
+    const result = parseJSON(text);
     if (result.error) {
       hideLoading();
-      setUrlInfo(`ℹ️ ${result.error}<br><br>Instagram's login wall sometimes blocks automated access. Switch to <strong>Paste Caption</strong> mode: open the Instagram app, long-press the caption → <em>Copy</em>, then paste it here.`);
-      showError('Could not read this post automatically — see tip below.');
+      setUrlInfo(`ℹ️ ${result.error}<br><br>Try the <strong>Listen</strong> tab — play the video with sound on and tap the mic button to extract the recipe from the audio.`);
+      showError('Could not read this post automatically.');
       document.getElementById('share-banner').classList.remove('show');
     } else {
-      markStep(2, 'done');
-      currentRecipe = result;
+      markStep(2,'done'); currentRecipe = result;
       setTimeout(() => { hideLoading(); renderRecipe(result); }, 350);
     }
-  } catch (err) {
-    hideLoading();
-    showError('Error: ' + err.message);
-  } finally {
-    document.getElementById('url-btn').disabled = false;
-  }
+  } catch(err) { hideLoading(); showError('Error: '+err.message); }
+  finally { document.getElementById('url-btn').disabled = false; }
 }
 
 /* ── EXTRACT FROM CAPTION ── */
 async function extractFromCaption() {
   const text = document.getElementById('caption-input').value.trim();
   if (!text) { showError('Please paste a caption first.'); return; }
-
+  const apiKey = requireApiKey();
+  if (!apiKey) return;
   hideError();
   document.getElementById('recipe-output').classList.remove('show');
   currentSourceUrl = '';
-
-  setLoadingSteps(['Reading caption…', 'Extracting recipe with AI…']);
-  markStep(0, 'active');
-
-  const prompt = `Extract the recipe from this Instagram caption. Return ONLY valid JSON (no markdown):
-
-"""
-${text}
-"""
-
-{
-  "title": "Recipe name",
-  "servings": "e.g. 4 servings or empty string",
-  "time": "prep/cook time or empty string",
-  "difficulty": "Easy / Medium / Hard or empty string",
-  "author": "",
-  "ingredients": [{ "amount": "200g", "item": "spaghetti" }],
-  "steps": ["Step one.", "Step two."],
-  "notes": "Tips, storage, variations. Empty string if none."
-}`;
-
+  setLoadingSteps(['Reading caption…','Extracting recipe…']);
+  markStep(0,'active');
   try {
-    markStep(0, 'done'); markStep(1, 'active');
-
+    markStep(0,'done'); markStep(1,'active');
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1200,
-        messages: [{ role: 'user', content: prompt }]
+        model: 'claude-sonnet-4-20250514', max_tokens: 1200,
+        messages: [{ role: 'user', content: `Extract the recipe from this Instagram caption. Return ONLY raw JSON:\n{"title":"","servings":"","time":"","difficulty":"","author":"","ingredients":[{"amount":"","item":""}],"steps":[""],"notes":""}\n\nCaption:\n"""\n${text}\n"""` }]
       })
     });
-
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
+    const raw = (data.content||[]).map(b=>b.text||'').join('');
+    markStep(1,'done'); currentRecipe = parseJSON(raw);
+    setTimeout(() => { hideLoading(); renderRecipe(currentRecipe); }, 300);
+  } catch(err) { hideLoading(); showError('Error: '+err.message); }
+}
 
-    const raw = (data.content || []).map(b => b.text || '').join('');
-    const clean = raw.replace(/```json|```/g, '').trim();
-    let result;
-    try { result = JSON.parse(clean); }
-    catch { const m = clean.match(/\{[\s\S]*\}/); if (m) result = JSON.parse(m[0]); else throw new Error('Could not find a recipe in the pasted text.'); }
+/* ── LISTEN / AUDIO MODE ── */
+function toggleListening() {
+  if (isListening) stopListening();
+  else startListening();
+}
 
-    markStep(1, 'done');
-    currentRecipe = result;
-    setTimeout(() => { hideLoading(); renderRecipe(result); }, 300);
-  } catch (err) {
-    hideLoading();
-    showError('Error: ' + err.message);
+function startListening() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    showError('Speech recognition is not supported in this browser. Try Chrome on Android.');
+    return;
   }
+
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isListening = true;
+    document.getElementById('record-btn').classList.add('recording');
+    document.getElementById('record-status').textContent = '🔴 Listening… play your video now';
+    document.getElementById('record-status').classList.add('active');
+  };
+
+  let interim = '';
+  recognition.onresult = (e) => {
+    interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) fullTranscript += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
+    }
+    const box = document.getElementById('transcript-box');
+    box.textContent = fullTranscript + interim;
+    box.classList.add('show');
+    box.scrollTop = box.scrollHeight;
+    if (fullTranscript.length > 20) {
+      document.getElementById('audio-extract-btn').style.display = 'inline-flex';
+    }
+  };
+
+  recognition.onerror = (e) => {
+    if (e.error !== 'no-speech') showError('Microphone error: ' + e.error);
+    stopListening();
+  };
+
+  recognition.onend = () => { if (isListening) recognition.start(); }; // keep alive
+
+  recognition.start();
+}
+
+function stopListening() {
+  isListening = false;
+  if (recognition) { recognition.onend = null; recognition.stop(); }
+  document.getElementById('record-btn').classList.remove('recording');
+  document.getElementById('record-status').textContent = fullTranscript.length > 10 ? '✓ Done — tap Extract to get the recipe' : 'Tap to start listening';
+  document.getElementById('record-status').classList.remove('active');
+}
+
+function clearTranscript() {
+  fullTranscript = '';
+  document.getElementById('transcript-box').textContent = '';
+  document.getElementById('transcript-box').classList.remove('show');
+  document.getElementById('audio-extract-btn').style.display = 'none';
+  document.getElementById('record-status').textContent = 'Tap to start listening';
+}
+
+async function extractFromTranscript() {
+  if (!fullTranscript.trim()) { showError('No audio captured yet. Tap the mic and play your video.'); return; }
+  const apiKey = requireApiKey();
+  if (!apiKey) return;
+  hideError();
+  document.getElementById('recipe-output').classList.remove('show');
+  currentSourceUrl = '';
+  setLoadingSteps(['Reading transcript…','Extracting recipe…']);
+  markStep(0,'active');
+  try {
+    markStep(0,'done'); markStep(1,'active');
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 1200,
+        messages: [{ role: 'user', content: `This is a transcript of someone speaking a recipe in a cooking video. Extract the recipe and return ONLY raw JSON:\n{"title":"","servings":"","time":"","difficulty":"","author":"","ingredients":[{"amount":"","item":""}],"steps":[""],"notes":""}\n\nTranscript:\n"""\n${fullTranscript}\n"""` }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const raw = (data.content||[]).map(b=>b.text||'').join('');
+    markStep(1,'done'); currentRecipe = parseJSON(raw);
+    setTimeout(() => { hideLoading(); renderRecipe(currentRecipe); }, 300);
+  } catch(err) { hideLoading(); showError('Error: '+err.message); }
+}
+
+/* ── HELPERS ── */
+function parseJSON(text) {
+  const clean = text.replace(/```json|```/g,'').trim();
+  try { return JSON.parse(clean); }
+  catch { const m = clean.match(/\{[\s\S]*\}/); if(m) return JSON.parse(m[0]); throw new Error('Could not parse response.'); }
 }
 
 /* ── RENDER ── */
 function renderRecipe(r) {
   document.getElementById('out-title').textContent = r.title;
-
   const meta = [];
-  if (r.servings) meta.push('👥 ' + r.servings);
-  if (r.time) meta.push('⏱ ' + r.time);
-  if (r.difficulty) meta.push('📊 ' + r.difficulty);
+  if (r.servings) meta.push('👥 '+r.servings);
+  if (r.time) meta.push('⏱ '+r.time);
+  if (r.difficulty) meta.push('📊 '+r.difficulty);
   document.getElementById('out-meta').textContent = meta.join('   ');
-
   const parts = [];
-  if (r.author) parts.push('@' + r.author.replace(/^@/, ''));
+  if (r.author) parts.push('@'+r.author.replace(/^@/,''));
   if (currentSourceUrl) parts.push(currentSourceUrl);
   document.getElementById('out-source').textContent = parts.join(' · ');
-
-  document.getElementById('out-ingredients').innerHTML =
-    r.ingredients.map(i => `<div class="ingredient-item"><span class="ingredient-amount">${i.amount}</span><span>${i.item}</span></div>`).join('');
-
-  document.getElementById('out-steps').innerHTML =
-    r.steps.map((s, i) => `<div class="step-item"><span class="step-num">${i+1}</span><span class="step-text">${s}</span></div>`).join('');
-
+  document.getElementById('out-ingredients').innerHTML = r.ingredients.map(i=>`<div class="ingredient-item"><span class="ingredient-amount">${i.amount}</span><span>${i.item}</span></div>`).join('');
+  document.getElementById('out-steps').innerHTML = r.steps.map((s,i)=>`<div class="step-item"><span class="step-num">${i+1}</span><span class="step-text">${s}</span></div>`).join('');
   const notesEl = document.getElementById('out-notes');
-  if (r.notes && r.notes.trim()) { notesEl.textContent = '💡 ' + r.notes; notesEl.style.display = 'block'; }
-  else { notesEl.style.display = 'none'; }
-
+  if (r.notes && r.notes.trim()) { notesEl.textContent = '💡 '+r.notes; notesEl.style.display='block'; } else notesEl.style.display='none';
   document.getElementById('recipe-output').classList.add('show');
-  document.getElementById('recipe-output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('recipe-output').scrollIntoView({behavior:'smooth',block:'start'});
   document.getElementById('share-banner').classList.remove('show');
 }
 
 /* ── EXPORT ── */
 function buildOneNoteHTML(r) {
-  const ingRows = r.ingredients.map(i =>
-    `<tr><td style="padding:5px 16px 5px 0;color:#6b7c5c;font-family:Courier New,monospace;font-size:13px;white-space:nowrap;">${i.amount}</td><td style="padding:5px 0;font-size:14px;">${i.item}</td></tr>`).join('');
-  const steps = r.steps.map(s => `<li style="padding:5px 0;font-size:14px;line-height:1.6;">${s}</li>`).join('');
-  const meta = [r.servings, r.time, r.difficulty].filter(Boolean).join(' · ');
-  const source = [r.author ? '@'+r.author.replace(/^@/,'') : '', currentSourceUrl].filter(Boolean).join(' · ');
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${r.title}</title></head>
-<body style="font-family:Calibri,Arial,sans-serif;max-width:780px;margin:0 auto;padding:28px;color:#1a1209;">
-<h1 style="font-size:28px;margin:0 0 6px;">${r.title}</h1>
-${meta?`<p style="color:#888;font-size:13px;margin:0 0 4px;">${meta}</p>`:''}
-${source?`<p style="color:#bbb;font-size:11px;margin:0 0 28px;">${source}</p>`:'<div style="height:24px;"></div>'}
-<h2 style="font-size:15px;color:#c8490a;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #f0ddd4;padding-bottom:6px;margin:0 0 12px;">Ingredients</h2>
-<table style="border-collapse:collapse;margin-bottom:28px;"><tbody>${ingRows}</tbody></table>
-<h2 style="font-size:15px;color:#c8490a;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #f0ddd4;padding-bottom:6px;margin:0 0 12px;">Instructions</h2>
-<ol style="padding-left:20px;margin:0 0 28px;">${steps}</ol>
-${r.notes?`<div style="background:#f9ede8;padding:14px 18px;border-left:3px solid #c8490a;font-size:13px;color:#5a3020;font-style:italic;margin-bottom:24px;">${r.notes}</div>`:''}
-<hr style="border:none;border-top:1px solid #e0d8cc;margin:16px 0 10px;">
-<p style="color:#ccc;font-size:10px;">Saved with Recipe·Note</p>
-</body></html>`;
+  const rows = r.ingredients.map(i=>`<tr><td style="padding:5px 16px 5px 0;color:#6b7c5c;font-family:Courier New,monospace;font-size:13px;white-space:nowrap;">${i.amount}</td><td style="padding:5px 0;font-size:14px;">${i.item}</td></tr>`).join('');
+  const steps = r.steps.map(s=>`<li style="padding:5px 0;font-size:14px;line-height:1.6;">${s}</li>`).join('');
+  const meta = [r.servings,r.time,r.difficulty].filter(Boolean).join(' · ');
+  const src = [r.author?'@'+r.author.replace(/^@/,''):'',currentSourceUrl].filter(Boolean).join(' · ');
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${r.title}</title></head><body style="font-family:Calibri,Arial,sans-serif;max-width:780px;margin:0 auto;padding:28px;color:#1a1209;"><h1 style="font-size:28px;margin:0 0 6px;">${r.title}</h1>${meta?`<p style="color:#888;font-size:13px;margin:0 0 4px;">${meta}</p>`:''} ${src?`<p style="color:#bbb;font-size:11px;margin:0 0 28px;">${src}</p>`:'<div style="height:24px;"></div>'}<h2 style="font-size:15px;color:#c8490a;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #f0ddd4;padding-bottom:6px;margin:0 0 12px;">Ingredients</h2><table style="border-collapse:collapse;margin-bottom:28px;"><tbody>${rows}</tbody></table><h2 style="font-size:15px;color:#c8490a;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid #f0ddd4;padding-bottom:6px;margin:0 0 12px;">Instructions</h2><ol style="padding-left:20px;margin:0 0 28px;">${steps}</ol>${r.notes?`<div style="background:#f9ede8;padding:14px 18px;border-left:3px solid #c8490a;font-size:13px;color:#5a3020;font-style:italic;margin-bottom:24px;">${r.notes}</div>`:''}<hr style="border:none;border-top:1px solid #e0d8cc;margin:16px 0 10px;"><p style="color:#ccc;font-size:10px;">Saved with Recipe·Note</p></body></html>`;
 }
 
-function sendToOneNote() {
-  if (!currentRecipe) return;
-  downloadHTML();
-  setActionMsg('📋 File downloaded! Drag it into any OneNote section, or use Insert → Page from File.');
-}
-
+function sendToOneNote() { if(!currentRecipe)return; downloadHTML(); setActionMsg('📋 Downloaded! Drag into OneNote or use Insert → Page from File.'); }
 function downloadHTML() {
-  if (!currentRecipe) return;
-  const blob = new Blob([buildOneNoteHTML(currentRecipe)], { type: 'text/html' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = currentRecipe.title.replace(/[^a-z0-9]/gi,'_').toLowerCase() + '.html';
+  if(!currentRecipe)return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([buildOneNoteHTML(currentRecipe)],{type:'text/html'}));
+  a.download=currentRecipe.title.replace(/[^a-z0-9]/gi,'_').toLowerCase()+'.html';
   a.click();
 }
-
 function copyAsText() {
-  if (!currentRecipe) return;
-  const r = currentRecipe;
-  const lines = [r.title, [r.servings,r.time,r.difficulty].filter(Boolean).join(' · '), '',
-    'INGREDIENTS', ...r.ingredients.map(i=>`  ${i.amount.padEnd(14)} ${i.item}`), '',
-    'INSTRUCTIONS', ...r.steps.map((s,i)=>`  ${i+1}. ${s}`),
-    ...(r.notes?['','NOTES','  '+r.notes]:[]),
-    ...(currentSourceUrl?['','Source: '+currentSourceUrl]:[])];
-  navigator.clipboard.writeText(lines.join('\n')).then(() => {
-    setActionMsg('✓ Copied!');
-    setTimeout(() => setActionMsg(''), 3000);
-  });
+  if(!currentRecipe)return;
+  const r=currentRecipe;
+  const lines=[r.title,[r.servings,r.time,r.difficulty].filter(Boolean).join(' · '),'','INGREDIENTS',...r.ingredients.map(i=>`  ${i.amount.padEnd(14)} ${i.item}`),'','INSTRUCTIONS',...r.steps.map((s,i)=>`  ${i+1}. ${s}`),...(r.notes?['','NOTES','  '+r.notes]:[]),...(currentSourceUrl?['','Source: '+currentSourceUrl]:[])];
+  navigator.clipboard.writeText(lines.join('\n')).then(()=>{setActionMsg('✓ Copied!');setTimeout(()=>setActionMsg(''),3000);});
 }
-
-function setActionMsg(msg) { document.getElementById('action-msg').textContent = msg; }
+function setActionMsg(msg){document.getElementById('action-msg').textContent=msg;}
 </script>
 </body>
 </html>
