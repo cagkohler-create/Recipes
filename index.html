@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Recipe·Note">
 <title>Recipe·Note — Instagram to OneNote</title>
-<!-- manifest injected dynamically below -->
+<link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -502,36 +502,6 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
 }
 
 /* ── SERVICE WORKER ── */
-// ── INLINE MANIFEST ──
-(function() {
-  const manifest = {
-    name: "Recipe·Note",
-    short_name: "Recipe·Note",
-    description: "Convert Instagram recipe posts into OneNote pages",
-    start_url: "./",
-    display: "standalone",
-    background_color: "#faf7f2",
-    theme_color: "#1a1209",
-    orientation: "portrait-primary",
-    icons: [
-      { src: "https://placehold.co/192x192/1a1209/c8490a?text=RN", sizes: "192x192", type: "image/png", purpose: "any maskable" },
-      { src: "https://placehold.co/512x512/1a1209/c8490a?text=RN", sizes: "512x512", type: "image/png", purpose: "any maskable" }
-    ],
-    share_target: {
-      action: "./",
-      method: "GET",
-      enctype: "application/x-www-form-urlencoded",
-      params: { title: "title", text: "text", url: "url" }
-    }
-  };
-  const blob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('link');
-  link.rel = 'manifest';
-  link.href = url;
-  document.head.appendChild(link);
-})();
-
 // ── INLINE SERVICE WORKER ──
 if ('serviceWorker' in navigator) {
   const swCode = `
